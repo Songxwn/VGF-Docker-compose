@@ -1,0 +1,52 @@
+services:
+  victoria-logs:
+    image: victoriametrics/victoria-logs:latest
+    container_name: syslog-victoria-logs
+    volumes:
+      - ./victoria-logs-data:/victoria-logs-data
+    restart: always
+    command: [
+      "--retentionPeriod=365d"
+    ]
+    environment:
+      - TZ=Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:9428/health"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: syslog-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_INSTALL_PLUGINS=victoriametrics-logs-datasource
+      - GF_SECURITY_ADMIN_PASSWORD=Songxwn.com
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./grafana-data:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.17.2
+    container_name: syslog-filebeat
+    ports:
+      - "514:514/udp"
+    volumes:
+      - ./filebeat.docker.yml:/usr/share/filebeat/filebeat.yml:ro
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5066"]
+      interval: 60s
+      timeout: 10s
+      retries: 3

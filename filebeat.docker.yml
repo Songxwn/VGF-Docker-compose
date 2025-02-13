@@ -1,0 +1,20 @@
+http:
+  enabled: true
+  host: "http://0.0.0.0:5066"
+
+
+filebeat.inputs:
+  - type: udp
+    enabled: true
+    max_message_size: 10KiB
+    host: "0.0.0.0:514"
+    fields:
+      type: udp
+
+output.elasticsearch:
+  hosts: ["http://syslog-victoria-logs:9428/insert/elasticsearch/"]
+  parameters:
+    _msg_field: "message"
+    _time_field: "@timestamp"
+    _stream_fields: "host.hostname"
+  allow_older_versions: true
