@@ -1,6 +1,8 @@
 http:
   enabled: true
-  host: "http://0.0.0.0:5066"
+  host: "http://0.0.0.0:5066" 
+
+
 
 
 filebeat.inputs:
@@ -10,6 +12,13 @@ filebeat.inputs:
     host: "0.0.0.0:514"
     fields:
       type: udp
+
+
+processors:
+  - dissect:
+      tokenizer: "<%{syslog_pri}>%{timestamp} %{hostname} %%{log_level}/%{log_code}/%{log_action}(l):IPVer=%{ipver},Protocol=%{protocol},SourceIP=%{source_ip},DestinationIP=%{destination_ip},SourcePort=%{source_port},DestinationPort=%{destination_port},BeginTime=%{begin_time},EndTime=%{end_time},SendPkts=%{send_pkts},SendBytes=%{send_bytes},RcvPkts=%{rcv_pkts},RcvBytes=%{rcv_bytes},SourceVpnID=%{source_vpn_id},DestinationVpnID=%{destination_vpn_id},SourceZone=%{source_zone},DestinationZone=%{destination_zone},PolicyName=%{policy_name},CloseReason=%{close_reason}"
+      field: "message"
+      target_prefix: "parsed"
 
 output.elasticsearch:
   hosts: ["http://syslog-victoria-logs:9428/insert/elasticsearch/"]
