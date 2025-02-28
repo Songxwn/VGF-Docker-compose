@@ -2,7 +2,7 @@ apiVersion: 1
 datasources:
     # <string, required> Name of the VictoriaLogs datasource
     # displayed in Grafana panels and queries.
-  - name: VictoriaLogs-songxwn.com
+  - name: VictoriaLogs-0
     # <string, required> Sets the data source type.
     type: victoriametrics-logs-datasource
     # <string, required> Sets the access mode, either
